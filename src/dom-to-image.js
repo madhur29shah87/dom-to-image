@@ -38,6 +38,7 @@
     /**
      * @param {Node} node - The DOM Node object to render
      * @param {Object} options - Rendering options
+     * @param {Boolean} options.skipFonts - Whether to skip downloading fonts (default: false)
      * @param {Function} options.filter - Should return true if passed node should be included in the output
      *          (excluding node means excluding it's children as well). Not called on the root node.
      * @param {String} options.bgcolor - color for the background, any valid CSS color value.
@@ -57,7 +58,11 @@
             .then(function (node) {
                 return cloneNode(node, options.filter, true);
             })
-            .then(embedFonts)
+            .then(function(node) {
+                if (!options || !options.skipFonts)
+                    return embedFonts(node);
+                return node;
+            })
             .then(inlineImages)
             .then(applyOptions)
             .then(function (clone) {
